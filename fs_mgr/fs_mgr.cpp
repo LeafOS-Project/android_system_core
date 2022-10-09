@@ -876,9 +876,11 @@ static int __mount(const std::string& source, const std::string& target, const F
     }
     PINFO << __FUNCTION__ << "(source=" << source << source_missing << ",target=" << target
           << target_missing << ",type=" << entry.fs_type << ")=" << ret;
+#ifndef __ANDROID_RECOVERY__
     if ((ret == 0) && (mountflags & MS_RDONLY) != 0) {
         fs_mgr_set_blk_ro(source);
     }
+#endif
     if (ret == 0) {
         android::base::SetProperty("ro.boottime.init.mount." + Basename(target),
                                    std::to_string(t.duration().count()));
@@ -1453,9 +1455,11 @@ MountAllResult fs_mgr_mount_all(Fstab* fstab, int mount_mode) {
 
         // Skip mounting the root partition, as it will already have been mounted.
         if (current_entry.mount_point == "/" || current_entry.mount_point == "/system") {
+#ifndef __ANDROID_RECOVERY__
             if ((current_entry.flags & MS_RDONLY) != 0) {
                 fs_mgr_set_blk_ro(current_entry.blk_device);
             }
+#endif
             continue;
         }
 
